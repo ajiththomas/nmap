@@ -1,0 +1,41 @@
+Command 1:
+ports=$(nmap -p- --min-rate=1000 -T4 10.129.230.226 | grep '^[0-9]' | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+Explanation:
+nmap -p- --min-rate=1000 -T4 10.129.230.226:
+nmap: Network mapper used for port scanning.
+-p-: Scans all 65,535 TCP ports.
+--min-rate=1000: Ensures the scan sends at least 1000 packets per second for speed.
+-T4: Sets timing template 4 (faster, but with higher chances of detection).
+10.129.230.226: The target IP address.
+This scans all ports on the target system quickly.
+| grep '^[0-9]':
+Filters lines that start with a number (indicating open ports in the scan output).
+| cut -d '/' -f 1:
+Extracts the port numbers (before the / in the nmap output).
+| tr '\n' ',':
+Replaces newlines with commas, creating a comma-separated list of ports.
+| sed s/,$//:
+Removes the trailing comma at the end of the list.
+Final Result: The ports variable will contain a comma-separated list of open ports (e.g., 22,80,443).
+
+
+Command 2:
+nmap -p$ports -sC -sV 10.129.230.226
+
+Explanation:
+
+nmap -p$ports:
+Scans only the ports listed in the $ports variable.
+-sC:
+Runs Nmap’s default scripts (--script=default) for enumeration and testing.
+-sV:
+Detects service versions running on the open ports.
+10.129.230.226:
+The target IP address.
+Purpose: This focuses on enumerating and identifying the services and their versions on the open ports discovered earlier.
+
+Workflow Summary:
+The first command identifies all open ports on the target and stores them as a comma-separated list.
+The second command runs a more detailed scan on those specific ports to gather service and version information.
+This approach is efficient because the second scan is more focused, saving time by targeting only the open ports. It’s a common method in cybersecurity to minimize noise and speed up scans.
